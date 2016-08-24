@@ -22,11 +22,11 @@
   },
   "homepage": "https://github.com/austinjp/bibtex-to-csl-json#readme",
   "dependencies": {
-    "citeproc-js-node-patch": "0.0.1",
-    "zotero-bibtex-parse": "0.0.13"
+    "citeproc-js-node-patch": ">=0.0.2",
+    "zotero-bibtex-parse": "=0.0.13"
   },
   "devDependencies": {
-    "citeproc-js-node-patch": "0.0.1",
-    "zotero-bibtex-parse": "0.0.13"
+    "citeproc-js-node-patch": ">=0.0.1",
+    "zotero-bibtex-parse": "=0.0.13"
   }
 }
