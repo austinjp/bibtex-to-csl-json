@@ -1,0 +1,24 @@
+{
+  "name": "bibtex-to-csl-json",
+  "version": "0.0.1",
+  "description": "Convert bibtex to CSL JSON",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/austinjp/bibtex-to-csl-json.git"
+  },
+  "keywords": [
+    "csl",
+    "json",
+    "bibtex"
+  ],
+  "author": "austinjp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/austinjp/bibtex-to-csl-json/issues"
+  },
+  "homepage": "https://github.com/austinjp/bibtex-to-csl-json#readme"
+}
