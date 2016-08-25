@@ -21,10 +21,13 @@ b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
 
     var bib = engine.makeBibliography();
 
+    /*
     return {
 	bibliography: bib,
 	csljson: csljson
     };
+    */
+    return csljson;
 
 }
 
