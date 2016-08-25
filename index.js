@@ -1,58 +1,24 @@
 var b2cj = function() {};
-b2cj.prototype.parsefile = function(bibfile) {
+b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
 
     var fs = require("fs");
     var util = require("util");
     var citeproc = require("citeproc-js-node-patch");
     var zotbib = require("zotero-bibtex-parse");
 
-    // var bibfile;
-    // bibfile = 'literature.bib'; // mine
-    // bibfile = 'literature2.bib'; // the one from citeproc-js-node or whatever
-
-    var bibtex = fs.readFileSync(bibfile, 'utf8');
-
-    var items = {
-	"14058/RN9M5BF3": {
-            "accessed": {
-		"month":"9", "year":"2010", "day":"10"
-            },
-            "id":"14058/RN9M5BF3",
-            "author": [ { "given":"Adel", "family":"Hendaoui" }, { "given":"Moez", "family":"Limayem" }, { "given":"Craig W.", "family":"Thompson" } ],
-            "title":"3D Social Virtual Worlds: <i>Research Issues and Challenges</i>",
-            "type":"article-journal",
-            "versionNumber":6816
-	}
-    };
-
-    var json = zotbib.toJSON(bibtex);
-
+    var json = zotbib.toJSON(fs.readFileSync(bibfile, 'utf8'));
     var jcsl = jsonToCSLJSON(json);
 
-
-    // console.log(items);
-    // console.log("###########################");
-    // console.log(jcsl);
-    // throw '';
-
-    // var json = bibtexParse(fs.readFileSync('literature.bib', 'utf8'));
-    // var json = bib2json(fs.readFileSync('literature.bib','utf8'));
-
-    var lang = 'en-US';
-
     var sys = new citeproc.simpleSys();
-    var locale = fs.readFileSync('./assets/csl/locales/locales-' + lang + '.xml', 'utf8');
-    var style = fs.readFileSync('./assets/csl/styles/harvard-imperial-college-london.csl', 'utf8');
+    var locale = fs.readFileSync(localesfile, 'utf8');
+    var style = fs.readFileSync(stylefile, 'utf8');
 
     sys.addLocale(lang, locale);
+    sys.items = jcsl;
 
     var engine = sys.newEngine(style, lang, null);
-    // var engine = citeproc.CSL.Engine(sys, style, lang);
-
-    sys.items = jcsl;
-    // sys.items = items2;
-
     engine.updateItems(Object.keys(sys.items));
+
     var bib = engine.makeBibliography();
 
     console.log(util.inspect(bib), true,null,true);
@@ -95,6 +61,7 @@ b2cj.prototype.parsefile = function(bibfile) {
                                     tags[oldKey.toLowerCase()] = oldObj[oldKey];
 				}
 
+				// All keys here must be lower case or a weird error pops out.
 				cslJson[ID]["id"] = ID;
 				cslJson[ID]["url"] = tags.url ? tags.url : "";
 				cslJson[ID]["doi"] = tags.doi ? tags.doi : "";
