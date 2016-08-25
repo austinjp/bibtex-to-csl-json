@@ -1,6 +1,6 @@
 {
   "name": "bibtex-to-csl-json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Convert bibtex to CSL JSON",
   "main": "index.js",
   "scripts": {

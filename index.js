@@ -21,7 +21,7 @@ b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
 
     var bib = engine.makeBibliography();
 
-    console.log(util.inspect(bib), true,null,true);
+    // console.log(util.inspect(bib), true,null,true);
 
 
     function jsonToCSLJSON(json) {
