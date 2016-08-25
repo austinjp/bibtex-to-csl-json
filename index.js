@@ -1,20 +1,13 @@
 var b2cj = function() {};
-b2cj.prototype.parsefile = function() {
-    console.log("Success!");
-};
-
-exports.b2cj = new b2cj();
-
-
-{
+b2cj.prototype.parsefile = function(bibfile) {
 
     var fs = require("fs");
     var util = require("util");
     var citeproc = require("citeproc-js-node-patch");
     var zotbib = require("zotero-bibtex-parse");
 
-    var bibfile;
-    bibfile = 'literature.bib'; // mine
+    // var bibfile;
+    // bibfile = 'literature.bib'; // mine
     // bibfile = 'literature2.bib'; // the one from citeproc-js-node or whatever
 
     var bibtex = fs.readFileSync(bibfile, 'utf8');
@@ -120,3 +113,5 @@ exports.b2cj = new b2cj();
 	return cslJson;
     }
 }
+
+exports.b2cj = new b2cj();
