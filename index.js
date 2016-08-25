@@ -1,44 +1,49 @@
-var b2cj = function() {};
-b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
+// var b2cj = function() {};
+// b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
+
+function B2CJ(bibfile, lang, localesfile, stylefile) {
+    this.bibfile = bibfile;
+    this.lang = lang;
+    this.localesfile = localesfile;
+    this.stylefile = stylefile;
 
     var fs = require("fs");
     var util = require("util");
     var citeproc = require("citeproc-js-node-patch");
     var zotbib = require("zotero-bibtex-parse");
 
-    var json = zotbib.toJSON(fs.readFileSync(bibfile, 'utf8'));
+    var json = zotbib.toJSON(fs.readFileSync(this.bibfile, 'utf8'));
     var csljson = jsonToCSLJSON(json);
 
     var sys = new citeproc.simpleSys();
-    var locale = fs.readFileSync(localesfile, 'utf8');
-    var style = fs.readFileSync(stylefile, 'utf8');
+    var locale = fs.readFileSync(this.localesfile, 'utf8');
+    var style = fs.readFileSync(this.stylefile, 'utf8');
 
-    sys.addLocale(lang, locale);
+    sys.addLocale(this.lang, locale);
     sys.items = csljson;
 
-    var engine = sys.newEngine(style, lang, null);
+    var engine = sys.newEngine(style, this.lang, null);
     engine.updateItems(Object.keys(sys.items));
 
     var bib = engine.makeBibliography();
 
-    /*
     return {
 	bibliography: bib,
 	csljson: csljson
     };
-    */
-    return csljson;
-
 }
 
     
 
 function jsonToCSLJSON(json) {
     // This is half-arsed, but it works for my purposes.
+
+    this.json = json;
     var cslJson = {};
-    for (var key in json) {
-        if (json.hasOwnProperty(key)) {
-	    var obj = json[key];
+
+    for (var key in this.json) {
+        if (this.json.hasOwnProperty(key)) {
+	    var obj = this.json[key];
 
 	    var ID;
 
@@ -92,4 +97,9 @@ function jsonToCSLJSON(json) {
     return cslJson;
 }
 
-exports.b2cj = new b2cj();
+// exports.b2cj = new b2cj();
+module.exports = {
+    b2cj: function(bibfile, lang, localesfile, stylefile) {
+	return new B2CJ(bibfile, lang, localesfile, stylefile);
+    }
+}
