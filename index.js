@@ -7,21 +7,21 @@ b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
     var zotbib = require("zotero-bibtex-parse");
 
     var json = zotbib.toJSON(fs.readFileSync(bibfile, 'utf8'));
-    var jcsl = jsonToCSLJSON(json);
+    var csljson = jsonToCSLJSON(json);
 
     var sys = new citeproc.simpleSys();
     var locale = fs.readFileSync(localesfile, 'utf8');
     var style = fs.readFileSync(stylefile, 'utf8');
 
     sys.addLocale(lang, locale);
-    sys.items = jcsl;
+    sys.items = csljson;
 
     var engine = sys.newEngine(style, lang, null);
     engine.updateItems(Object.keys(sys.items));
 
     var bib = engine.makeBibliography();
 
-    return bib;
+    return { bibliography: bib, csljson: csljson };
 
     // console.log(util.inspect(bib), true,null,true);
     
@@ -65,12 +65,15 @@ b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
 
 				// All keys here must be lower case or a weird error pops out.
 				cslJson[ID]["id"] = ID;
-				cslJson[ID]["url"] = tags.url ? tags.url : "";
-				cslJson[ID]["doi"] = tags.doi ? tags.doi : "";
-				cslJson[ID]["title"] = tags.title ? tags.title : "";
-				cslJson[ID]["page"] = tags.pages ? tags.pages : "";
+				cslJson[ID]["url"] = tags.url ? tags.url : undefined;
+				cslJson[ID]["doi"] = tags.doi ? tags.doi : undefined;
+				cslJson[ID]["title"] = tags.title ? tags.title : undefined;
+				cslJson[ID]["page"] = tags.pages ? tags.pages : undefined;
 
-				cslJson[ID]["accessed"] = { "month":"9","year":"2012" };
+				// FIXME Placeholder function, parse date.
+				cslJson[ID]["accessed"] = { "day":"1","month":"9","year":"2012" };
+
+				// FIXME Placeholder function, parse authors.
 				cslJson[ID]["author"] = [{ "given": Math.random().toString(26).substring(2,7), "family": Math.random().toString(26).substring(2,7) }];
                             }
 			}
