@@ -33,6 +33,31 @@ function B2CJ(bibfile, lang, localesfile, stylefile) {
     };
 }
 
+
+function monthToNum(month) {
+    // FIXME Use a standard lib for this.
+
+    // Return numbers and numeric strings without further analysis
+    if (typeof month === "number") { return month; }
+    if (!isNaN(parseFloat(month))) { return month; }
+
+    switch(true) {
+	case /^ja/i.test(month): return 01;
+	case /^f/i.test(month): return 02;
+	case /^mar/i.test(month): return 03;
+	case /^ap/i.test(month): return 04;
+	case /^may/i.test(month): return 05;
+	case /^jun/i.test(month): return 06;
+	case /^jul/i.test(month): return 07;
+	case /^au/i.test(month): return 08;
+	case /^s/i.test(month): return 09;
+	case /^o/i.test(month): return 10;
+	case /^n/i.test(month): return 11;
+	case /^d/i.test(month): return 12;
+    }
+
+    return undefined;
+}
     
 
 function jsonToCSLJSON(json) {
@@ -63,6 +88,7 @@ function jsonToCSLJSON(json) {
                           // Ignore for now..?
                           }
                         */
+
                         if (k2.toLowerCase() === "entrytags") {
 			    // Copy the object making all keys lower case.
 			    // Means there is far less checking to do.
@@ -82,8 +108,11 @@ function jsonToCSLJSON(json) {
 			    cslJson[ID]["title"] = tags.title ? tags.title : undefined;
 			    cslJson[ID]["page"] = tags.pages ? tags.pages : undefined;
 
-			    // FIXME Placeholder function, parse date.
-			    cslJson[ID]["accessed"] = { "day":"1","month":"9","year":"2012" };
+			    // Parse date.
+			    cslJson[ID]["accessed"] = { year: undefined, month: undefined, day: undefined };
+			    cslJson[ID]["accessed"]["year"] = tags.year ? tags.year : undefined;
+			    cslJson[ID]["accessed"]["month"] = tags.month ? monthToNum(tags.month) : undefined;
+			    cslJson[ID]["accessed"]["day"] = tags.day ? tags.day : undefined;
 
 			    // FIXME Placeholder function, parse authors.
 			    cslJson[ID]["author"] = [{ "given": Math.random().toString(26).substring(2,7), "family": Math.random().toString(26).substring(2,7) }];
