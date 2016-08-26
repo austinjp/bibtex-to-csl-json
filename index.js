@@ -109,10 +109,10 @@ function jsonToCSLJSON(json) {
 			    cslJson[ID]["page"] = tags.pages ? tags.pages : undefined;
 
 			    // Parse date.
-			    cslJson[ID]["accessed"] = { year: undefined, month: undefined, day: undefined };
-			    cslJson[ID]["accessed"]["year"] = tags.year ? tags.year : undefined;
-			    cslJson[ID]["accessed"]["month"] = tags.month ? monthToNum(tags.month) : undefined;
-			    cslJson[ID]["accessed"]["day"] = tags.day ? tags.day : undefined;
+			    cslJson[ID]["issued"] = { year: undefined, month: undefined, day: undefined };
+			    cslJson[ID]["issued"]["year"] = tags.year ? tags.year : undefined;
+			    cslJson[ID]["issued"]["month"] = tags.month ? monthToNum(tags.month) : undefined;
+			    cslJson[ID]["issued"]["day"] = tags.day ? tags.day : undefined;
 
 			    // FIXME Placeholder function, parse authors.
 			    cslJson[ID]["author"] = [{ "given": Math.random().toString(26).substring(2,7), "family": Math.random().toString(26).substring(2,7) }];
