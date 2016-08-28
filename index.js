@@ -1,10 +1,8 @@
-// var b2cj = function() {};
-// b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
-
 var fs = require("fs");
 var util = require("util");
 var citeproc = require("citeproc-js-node-patch");
-var zotbib = require("zotero-bibtex-parse");
+// var bibtexparser = require("zotero-bibtex-parse"); // Seems to strip curly braces :(
+var bibtexparser = require("bibtex-parser-js");
 var nameParts = require('nameparts');
 
 function B2CJ(bibfile, lang, localesfile, stylefile) {
@@ -13,7 +11,7 @@ function B2CJ(bibfile, lang, localesfile, stylefile) {
     this.localesfile = localesfile;
     this.stylefile = stylefile;
 
-    var json = zotbib.toJSON(fs.readFileSync(this.bibfile, 'utf8'));
+    var json = bibtexparser.toJSON(fs.readFileSync(this.bibfile, 'utf8'));
     var csljson = jsonToCSLJSON(json);
 
     var sys = new citeproc.simpleSys();
@@ -32,6 +30,12 @@ function B2CJ(bibfile, lang, localesfile, stylefile) {
 	bibliography: bib,
 	csljson: csljson
     };
+}
+
+function stripBraces(s) {
+    s = s.replace(/^{+/, "");
+    s = s.replace(/}+$/, "");
+    return s;
 }
 
 
@@ -67,6 +71,8 @@ function jsonToCSLJSON(json) {
     this.json = json;
     var cslJson = {};
 
+    // console.log(util.inspect(json, true, null, true));
+
     for (var key in this.json) {
         if (this.json.hasOwnProperty(key)) {
 	    var obj = this.json[key];
@@ -92,7 +98,7 @@ function jsonToCSLJSON(json) {
 
                         if (k2.toLowerCase() === "entrytags") {
 			    // Copy the object making all keys lower case.
-			    // Means there is far less checking to do.
+			    // Makes checking keys far simpler.
 			    var oldObj = obj[k2];
 			    var tags = {};
 			    var oldKey, oldKeys = Object.keys(oldObj);
@@ -102,12 +108,13 @@ function jsonToCSLJSON(json) {
                                 tags[oldKey.toLowerCase()] = oldObj[oldKey];
 			    }
 
-			    // All keys here must be lower case or a weird error pops out.
+			    // All keys here must be lower case or an error about disambiguating keys pops out.
 			    cslJson[ID]["id"] = ID;
 			    cslJson[ID]["url"] = tags.url ? tags.url : undefined;
 			    cslJson[ID]["doi"] = tags.doi ? tags.doi : undefined;
-			    cslJson[ID]["title"] = tags.title ? tags.title : undefined;
+			    cslJson[ID]["title"] = tags.title ? stripBraces(tags.title) : undefined;
 			    cslJson[ID]["page"] = tags.pages ? tags.pages : undefined;
+			    cslJson[ID]["journal"] = tags.journal ? stripBraces(tags.journal) : undefined;
 
 			    // Parse date.
 			    cslJson[ID]["issued"] = { year: undefined, month: undefined, day: undefined };
@@ -119,19 +126,30 @@ function jsonToCSLJSON(json) {
 			    // FIXME Needs to better understand names of institutions vs people,
 			    // and those marked "do not touch" i.e. wrapped in curly braces.
 			    cslJson[ID]["author"] = [];
-			    var auths = tags.author ? tags.author.split(/\s+and\s+/) : [];
-			    if (auths.length >= 2) {
-				for (var a in auths) {
-				    var nameGiven, nameFamily;
-				    nameGiven = nameParts.parse(auths[a]).firstName;
-				    nameFamily = nameParts.parse(auths[a]).lastName;
+			    if (tags.author.match(/^{/)) {
+				// Do not parse authors that are wrapped in curly braces,
+				// since this means "do not touch" in bibtex (I think!)
+				cslJson[ID]["author"].push({
+				    "family": stripBraces(tags.author)
+				});
+			    } else {
+				var auths = tags.author ? tags.author.split(/\s+and\s+/) : [];
+				if (auths.length >= 1) {
+				    for (var a in auths) {
+					var nameGiven, nameFamily;
+					nameGiven = nameParts.parse(auths[a]).firstName;
+					nameFamily = nameParts.parse(auths[a]).lastName;
+					cslJson[ID]["author"].push({
+					    "given": nameGiven,
+					    "family": nameFamily
+					});
+				    }
+				} else {
 				    cslJson[ID]["author"].push({
-					"given": nameParts.parse(auths[a]).firstName,
-					"family": nameParts.parse(auths[a]).lastName,
+					"given": nameGiven,
+					"family": nameFamily
 				    });
 				}
-			    } else {
-				cslJson[ID]["author"].push( { "family": tags.author } );
 			    }
                         }
 		    }
@@ -143,7 +161,6 @@ function jsonToCSLJSON(json) {
     return cslJson;
 }
 
-// exports.b2cj = new b2cj();
 module.exports = {
     b2cj: function(bibfile, lang, localesfile, stylefile) {
 	return new B2CJ(bibfile, lang, localesfile, stylefile);

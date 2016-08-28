@@ -1,6 +1,6 @@
 {
   "name": "bibtex-to-csl-json",
-  "version": "0.0.15",
+  "version": "0.1.0",
   "description": "Convert bibtex to CSL JSON",
   "main": "index.js",
   "scripts": {
@@ -22,11 +22,13 @@
   },
   "homepage": "https://github.com/austinjp/bibtex-to-csl-json#readme",
   "dependencies": {
+    "bibtex-parser-js": "0.0.2",
     "citeproc-js-node-patch": ">=0.0.2",
     "nameparts": "^1.0.3",
     "zotero-bibtex-parse": "=0.0.13"
   },
   "devDependencies": {
+    "bibtex-parser-js": "0.0.2",
     "citeproc-js-node-patch": ">=0.0.2",
     "nameparts": "^1.0.3",
     "zotero-bibtex-parse": "=0.0.13"
