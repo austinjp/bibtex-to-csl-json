@@ -1,16 +1,17 @@
 // var b2cj = function() {};
 // b2cj.prototype.parsefile = function(bibfile, lang, localesfile, stylefile) {
 
+var fs = require("fs");
+var util = require("util");
+var citeproc = require("citeproc-js-node-patch");
+var zotbib = require("zotero-bibtex-parse");
+var nameParts = require('nameparts');
+
 function B2CJ(bibfile, lang, localesfile, stylefile) {
     this.bibfile = bibfile;
     this.lang = lang;
     this.localesfile = localesfile;
     this.stylefile = stylefile;
-
-    var fs = require("fs");
-    var util = require("util");
-    var citeproc = require("citeproc-js-node-patch");
-    var zotbib = require("zotero-bibtex-parse");
 
     var json = zotbib.toJSON(fs.readFileSync(this.bibfile, 'utf8'));
     var csljson = jsonToCSLJSON(json);
@@ -114,8 +115,24 @@ function jsonToCSLJSON(json) {
 			    cslJson[ID]["issued"]["month"] = tags.month ? monthToNum(tags.month) : undefined;
 			    cslJson[ID]["issued"]["day"] = tags.day ? tags.day : undefined;
 
-			    // FIXME Placeholder function, parse authors.
-			    cslJson[ID]["author"] = [{ "given": Math.random().toString(26).substring(2,7), "family": Math.random().toString(26).substring(2,7) }];
+			    // Parse authors
+			    // FIXME Needs to better understand names of institutions vs people,
+			    // and those marked "do not touch" i.e. wrapped in curly braces.
+			    cslJson[ID]["author"] = [];
+			    var auths = tags.author ? tags.author.split(/\s+and\s+/) : [];
+			    if (auths.length >= 2) {
+				for (var a in auths) {
+				    var nameGiven, nameFamily;
+				    nameGiven = nameParts.parse(auths[a]).firstName;
+				    nameFamily = nameParts.parse(auths[a]).lastName;
+				    cslJson[ID]["author"].push({
+					"given": nameParts.parse(auths[a]).firstName,
+					"family": nameParts.parse(auths[a]).lastName,
+				    });
+				}
+			    } else {
+				cslJson[ID]["author"].push( { "family": tags.author } );
+			    }
                         }
 		    }
 
