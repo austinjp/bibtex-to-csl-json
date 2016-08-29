@@ -136,24 +136,36 @@ function jsonToCSLJSON(json) {
 				var auths = tags.author ? tags.author.split(/\s+and\s+/) : [];
 				if (auths.length >= 1) {
 				    for (var a in auths) {
-					var nameGiven, nameFamily, parts;
-					parts = nameParts.parse(auths[a]);
+					var nameGiven, nameFamily;
+					var n = auths[a];
+					if (typeof n === "string") {
+					    var parts = nameParts.parse(n);
+
+					    nameGiven = parts.firstName ? parts.firstName : undefined;
+					    nameFamily = parts.lastName ? parts.lastName : undefined;
+					    cslJson[ID]["author"].push({
+						"given": nameGiven,
+						"family": nameFamily
+					    });
+					}/* else {
+					    console.log("Not a string: " + typeof n);
+					}*/
+				    }
+				} else {
+				    var nameGiven, nameFamily;
+				    var n = tags.author;
+				    if (typeof n === "string") {
+					var parts = nameParts.parse(n);
+
 					nameGiven = parts.firstName ? parts.firstName : undefined;
 					nameFamily = parts.lastName ? parts.lastName : undefined;
 					cslJson[ID]["author"].push({
 					    "given": nameGiven,
 					    "family": nameFamily
 					});
-				    }
-				} else {
-				    var nameGiven, nameFamily, parts;
-				    parts = nameParts.parse(auths[a]);
-				    nameGiven = parts.firstName ? parts.firstName : undefined;
-				    nameFamily = parts.lastName ? parts.lastName : undefined;
-				    cslJson[ID]["author"].push({
-					"given": nameGiven,
-					"family": nameFamily
-				    });
+				    }/* else {
+					console.log("Not a string: " + typeof n);
+				    }*/
 				}
 			    }
                         }
