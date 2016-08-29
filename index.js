@@ -137,14 +137,17 @@ function jsonToCSLJSON(json) {
 				if (auths.length >= 1) {
 				    for (var a in auths) {
 					var nameGiven, nameFamily;
-					nameGiven = nameParts.parse(auths[a]).firstName;
-					nameFamily = nameParts.parse(auths[a]).lastName;
+					nameGiven = auths[a] ? nameParts.parse(auths[a]).firstName : undefined;
+					nameFamily = auths[a] ? nameParts.parse(auths[a]).lastName : undefined;
 					cslJson[ID]["author"].push({
 					    "given": nameGiven,
 					    "family": nameFamily
 					});
 				    }
 				} else {
+				    var nameGiven, nameFamily;
+				    nameGiven = tags.author ? nameParts.parse(tags.author).firstName : undefined;
+				    nameFamily = tags.author ? nameParts.parse(tags.author).lastName : undefined;
 				    cslJson[ID]["author"].push({
 					"given": nameGiven,
 					"family": nameFamily
