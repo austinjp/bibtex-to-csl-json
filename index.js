@@ -1,6 +1,6 @@
 var fs = require("fs");
 var util = require("util");
-var citeproc = require("citeproc-js-node-patch");
+var citeproc = require("citeproc-js-node");
 // var bibtexparser = require("zotero-bibtex-parse"); // Seems to strip curly braces :(
 var bibtexparser = require("bibtex-parser-js");
 var nameParts = require('nameparts');
